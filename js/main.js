@@ -36,7 +36,7 @@ for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the butto
 for (let i = 0; i < numbersBtns.length; i++) {//add the listeners to the buttons
     numbersBtns[i].addEventListener('click', (e) => {
         pressedButtonOp ? activeButtonHandler() : null;
-        result >= 0 ? cleanUp(): console.log(result);
+        result == 0 ? cleanUp() : null;
         screenFunction(e.target.value);
     })
 }
@@ -78,23 +78,25 @@ const operationDispatcher = (op) => {
     screenValue = Number(screenValue);
     operations.push(op);
     numbers.push(screenValue);
-    if (operations.length > 1 && operations[0] === operations[1] || operations[1] === 'equal') {
-        operations[0] == 'plus' ? plus(numbers[0], numbers[1]) : null;
-        operations[0] == 'menos' ? minus(numbers[0], numbers[1]) : null;
-        operations[0] == 'multi' ? multiply(numbers[0], numbers[1]) : null;
-        operations[0] == 'division' ? division(numbers[0], numbers[1]) : null;
-        cleanUp();
-        screenFunction(result);
-        for(let i = 0; i < operations.length; i++) {
-            operations.pop();
+    if (operations.length > 1) {
+        if (operations[0] === operations[1] || operations[1] === 'equal') {
+            operations[0] == 'plus' ? plus(numbers[0], numbers[1]) : null;
+            operations[0] == 'menos' ? minus(numbers[0], numbers[1]) : null;
+            operations[0] == 'multi' ? multiply(numbers[0], numbers[1]) : null;
+            operations[0] == 'division' ? division(numbers[0], numbers[1]) : null;
+            cleanUp();
+            screenFunction(result);
+            for (let i = 0; i < operations.length; i++) {
+                operations.pop();
+            }
+            for (let i = 0; i <= numbers.length; i++) {
+                numbers.pop();
+            }
+            numbers.push(result);
+            result = 0;
         }
-        for(let i = 0; i <= numbers.length; i++) {
-            numbers.pop();
-        }
-        numbers.push(result);
-        result = 0;
     } else if (operations.length > 2 && operations[0] === 'plus' || operations[0] === 'menos' && operations[1] === 'multi' || operations[1] === 'division' || operations[1] === 'equal') {
-        
+
         operations
 
         cleanUp();
