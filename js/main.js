@@ -20,22 +20,17 @@ for (let i = 0; i < buttons.length; i++) {//fill all the arrays with their respe
 };
 
 for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the buttons
-    if (operatorsBtns[i].value == 'equal') {
-        operatorsBtns[i].addEventListener('click', (e) => {
-            equalFunction();
-        })
-    }
     operatorsBtns[i].addEventListener('click', (e) => {
-        pressedButtonOp = e.target;
+        activeButtonHandler(e.target);
+
         operationDispatcher(e.target.value);
-        activeButtonHandler();
     })
 }
 
 
 for (let i = 0; i < numbersBtns.length; i++) {//add the listeners to the buttons
     numbersBtns[i].addEventListener('click', (e) => {
-        pressedButtonOp ? activeButtonHandler() : null;
+        pressedButtonOp ? activeButtonHandler(pressedButtonOp) : null;
         result == 0 ? cleanUp() : null;
         screenFunction(e.target.value);
     })
@@ -57,9 +52,30 @@ const screenFunction = (value) => {
     screen.innerHTML = screenValue;
 };
 
-const activeButtonHandler = () => {
-    operationButtonFlag = !operationButtonFlag
-    pressedButtonOp.disabled = operationButtonFlag;
+const activeButtonHandler = (element) => {
+    if(pressedButtonOp != element && operationButtonFlag){
+        operationButtonFlag = !operationButtonFlag;
+        pressedButtonOp.disabled = operationButtonFlag;
+        isActive();
+        pressedButtonOp = element
+        operationButtonFlag = !operationButtonFlag;
+        pressedButtonOp.disabled = operationButtonFlag;
+        isActive();
+    }else{
+        pressedButtonOp = element;
+        operationButtonFlag = !operationButtonFlag;
+        pressedButtonOp.disabled = operationButtonFlag;
+        isActive();
+    }
+
+}
+const isActive = () => {
+    console.log(operationButtonFlag);
+    if(operationButtonFlag){
+        pressedButtonOp.classList.add('isActive');
+    }else{
+        pressedButtonOp.classList.remove('isActive');
+    }
 }
 // const mathOrderHandler = (op) => {
 //     console.log(op)
@@ -79,15 +95,16 @@ const operationDispatcher = (op) => {
     operations.push(op);
     numbers.push(screenValue);
     if (operations.length > 1) {
-        if (operations[0] === operations[1] || operations[1] === 'equal') {
+        if (['plus', 'menos', 'multi', 'division', 'equal'].includes(operations[0]) && ['plus', 'menos', 'equal'].includes(operations[1])) {
             operations[0] == 'plus' ? plus(numbers[0], numbers[1]) : null;
             operations[0] == 'menos' ? minus(numbers[0], numbers[1]) : null;
             operations[0] == 'multi' ? multiply(numbers[0], numbers[1]) : null;
             operations[0] == 'division' ? division(numbers[0], numbers[1]) : null;
+            operations[0] == 'equal' ? equalFunction() : null;
             cleanUp();
             screenFunction(result);
             for (let i = 0; i < operations.length; i++) {
-                operations.pop();
+                operations.shift();
             }
             for (let i = 0; i <= numbers.length; i++) {
                 numbers.pop();
@@ -95,14 +112,6 @@ const operationDispatcher = (op) => {
             numbers.push(result);
             result = 0;
         }
-    } else if (operations.length > 2 && operations[0] === 'plus' || operations[0] === 'menos' && operations[1] === 'multi' || operations[1] === 'division' || operations[1] === 'equal') {
-
-        operations
-
-        cleanUp();
-        screenFunction(result);
-        console.log(operations[0], operations[1]);
-        console.log(numbers[0], numbers[1]);
     }
     else {
         cleanUp();
@@ -122,8 +131,11 @@ const enableFloatNumber = (flag) => { //reset the dot button usage
     flag ? flag = false : false;
 }
 const equalFunction = () => {
-    console.log('equal function');
+    operations.pop();
+    console.log(operations);
+    console.log('hehehehe');
 }
+
 
 
 
