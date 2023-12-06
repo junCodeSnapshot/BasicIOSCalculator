@@ -3,6 +3,7 @@ let screen = document.getElementById('screen');
 let screenValue = '0';
 let floatBtnflag = false;
 let operationButtonFlag = false;
+let firstUseFlag = true;
 let pressedButtonOp;
 let operations = [];
 let numbers = [];
@@ -10,6 +11,11 @@ let result;
 let operatorsBtns = [], numbersBtns = []; //get all numbers and operators
 
 
+/*TODO:
+-Add AC function that makes changes on fisrtUseFlag 
+-Exclude the equal button is Active class 
+-Mathematical properties fixes
+*/
 
 for (let i = 0; i < buttons.length; i++) {//fill all the arrays with their respective buttons
     if (buttons[i].value.length > 1) {
@@ -22,7 +28,6 @@ for (let i = 0; i < buttons.length; i++) {//fill all the arrays with their respe
 for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the buttons
     operatorsBtns[i].addEventListener('click', (e) => {
         activeButtonHandler(e.target);
-
         operationDispatcher(e.target.value);
     })
 }
@@ -30,9 +35,9 @@ for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the butto
 
 for (let i = 0; i < numbersBtns.length; i++) {//add the listeners to the buttons
     numbersBtns[i].addEventListener('click', (e) => {
-        pressedButtonOp ? activeButtonHandler(pressedButtonOp) : null;
-        result == 0 ? cleanUp() : null;
-        screenFunction(e.target.value);
+
+        pressedButtonOp ? (cleanUp(), activeButtonHandler(pressedButtonOp), valueOnScreenHandler(e.target.value)) : valueOnScreenHandler(e.target.value);
+        screenFunction();
     })
 }
 
@@ -41,19 +46,16 @@ for (let i = 0; i < numbersBtns.length; i++) {//add the listeners to the buttons
 
 //Valor inicial del display y manejo del . 
 const valueOnScreenHandler = (value) => { //working!
-    screenValue == '0' ? value != "." ? cleanUp() : '0' : screenValue;
-    value == '.' ? floatBtnflag = true : floatBtnflag;
-    screenValue += value;
+    screenValue === '0' ? value != '.' ? (cleanUp(), screenValue += value) : screenValue += value : screenValue += value;
 };
 
 //Mostrar valores en la calculadora
-const screenFunction = (value) => {
-    valueOnScreenHandler(value);
+const screenFunction = () => {
     screen.innerHTML = screenValue;
 };
 
 const activeButtonHandler = (element) => {
-    if(pressedButtonOp != element && operationButtonFlag){
+    if (pressedButtonOp != element && operationButtonFlag) {
         operationButtonFlag = !operationButtonFlag;
         pressedButtonOp.disabled = operationButtonFlag;
         isActive();
@@ -61,7 +63,7 @@ const activeButtonHandler = (element) => {
         operationButtonFlag = !operationButtonFlag;
         pressedButtonOp.disabled = operationButtonFlag;
         isActive();
-    }else{
+    } else {
         pressedButtonOp = element;
         operationButtonFlag = !operationButtonFlag;
         pressedButtonOp.disabled = operationButtonFlag;
@@ -70,10 +72,9 @@ const activeButtonHandler = (element) => {
 
 }
 const isActive = () => {
-    console.log(operationButtonFlag);
-    if(operationButtonFlag){
+    if (operationButtonFlag) {
         pressedButtonOp.classList.add('isActive');
-    }else{
+    } else {
         pressedButtonOp.classList.remove('isActive');
     }
 }
@@ -94,15 +95,18 @@ const operationDispatcher = (op) => {
     screenValue = Number(screenValue);
     operations.push(op);
     numbers.push(screenValue);
-    if (operations.length > 1) {
+
+    if (operations.length > 1) {//check the loop
         if (['plus', 'menos', 'multi', 'division', 'equal'].includes(operations[0]) && ['plus', 'menos', 'equal'].includes(operations[1])) {
             operations[0] == 'plus' ? plus(numbers[0], numbers[1]) : null;
+            console.log('ayuwoki')
             operations[0] == 'menos' ? minus(numbers[0], numbers[1]) : null;
             operations[0] == 'multi' ? multiply(numbers[0], numbers[1]) : null;
             operations[0] == 'division' ? division(numbers[0], numbers[1]) : null;
             operations[0] == 'equal' ? equalFunction() : null;
-            cleanUp();
-            screenFunction(result);
+            cleanUp();//limpia el ultimo numero en screenvalue para que no se supen con el resultdo.
+            valueOnScreenHandler(result); //
+            screenFunction();
             for (let i = 0; i < operations.length; i++) {
                 operations.shift();
             }
@@ -114,8 +118,8 @@ const operationDispatcher = (op) => {
         }
     }
     else {
-        cleanUp();
-        screenFunction(screenValue);
+        // cleanUp();
+        screenFunction();
         console.log('not here')
     }
 };
