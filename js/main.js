@@ -9,6 +9,8 @@ let operations = [];
 let numbers = [];
 let result;
 let operatorsBtns = [], numbersBtns = []; //get all numbers and operators
+let prevOp;
+let prevNum;
 
 
 /*TODO:
@@ -32,23 +34,24 @@ for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the butto
             numbers.push(screenValue)
             firstUseFlag = false;
         }
-        if (operations[0] && ['plus', 'menos',].includes(e.target.value)) {
-            operationDispatcher();
-            cleanUp();
-            valueOnScreenHandler(result);
-            screenFunction();
-        } else if (operations[0] && ['equal'].includes(e.target.value)) {
-            equalFunction();
-            cleanUp();
-            valueOnScreenHandler(result);
-            screenFunction();
-        } else if (operations[1] && ['division', 'multi'].includes(e.target.    value)) {
+        if (operations[0] && ['plus', 'menos', 'equal'].includes(e.target.value)) {
+            console.log('normal 1 symbol operation');
+            prevOp = operations[operations.length - 1];
+            prevNum = numbers[numbers.length - 1];
             operationDispatcher();
             cleanUp();
             valueOnScreenHandler(result);
             screenFunction();
         }
-        else if (operations.length <= 0 && numbers.length >= 1 && e.target.value === 'equal') {
+        else if (operations[1] && ['division', 'multi'].includes(e.target.value)) {
+            prevOp = operations[operations.length - 1];
+            prevNum = numbers[numbers.length - 1];
+            console.log('division or multi');
+            operationDispatcher();
+            cleanUp();
+            valueOnScreenHandler(result);
+            screenFunction();
+        } else if (operations.length == 0 && e.target.value === 'equal') {
             equalFunction();
             cleanUp();
             valueOnScreenHandler(result);
@@ -112,19 +115,20 @@ const isActive = () => {
 }
 
 const operationDispatcher = () => {
-    if (['plus', 'menos', 'multi', 'division'].includes(operations[0])) {
-        operations[0] === 'plus' ? plus(numbers[0], numbers[1]) : null;
-        operations[0] === 'menos' ? minus(numbers[0], numbers[1]) : null;
-        operations[0] === 'multi' ? multiply(numbers[0], numbers[1]) : null;
-        operations[0] === 'division' ? division(numbers[0], numbers[1]) : null;
-        numbers.push(result);
-    }
     if (['multi', 'division'].includes(operations[1])) {
         operations[1] === 'multi' ? multiply(numbers[2], numbers[1]) : null;
         operations[1] === 'division' ? division(numbers[2], numbers[1]) : null;
         operations[0] == 'plus' ? plus(numbers[0], result) : minus(numbers[0], result);
         numbers.push(result);
-    }
+    } else
+        if (['plus', 'menos', 'multi', 'division'].includes(operations[0])) {
+            operations[0] === 'plus' ? plus(numbers[0], numbers[1]) : null;
+            operations[0] === 'menos' ? minus(numbers[0], numbers[1]) : null;
+            operations[0] === 'multi' ? multiply(numbers[0], numbers[1]) : null;
+            operations[0] === 'division' ? division(numbers[0], numbers[1]) : null;
+            numbers.push(result);
+        }
+
     while (operations.length > 0) {
         operations.shift();
     }
@@ -144,20 +148,10 @@ const enableFloatNumber = (flag) => { //reset the dot button usage
     flag ? flag = false : false;
 }
 const equalFunction = () => {
-    console.log('here');
-    let prevOp = operations[operations.length - 1];
-    let prevNum = numbers[numbers.length - 1];
     console.log(prevOp, prevNum);
-    if (prevOp && prevNum) {
-        operations.push(prevOp);
-        numbers.push(prevNum);
-        operationDispatcher();
-    } else {
-        operationDispatcher();
-    }
-    // operationButtonFlag = ;
-    // pressedButtonOp.disabled = operationButtonFlag
-    // isActive();
+    operations.push(prevOp);
+    numbers.push(prevNum);
+    operationDispatcher();
 }
 
 
