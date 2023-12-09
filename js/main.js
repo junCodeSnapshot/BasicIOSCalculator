@@ -14,8 +14,10 @@ let prevNum;
 
 
 /*TODO:
--Add AC function that makes changes on fisrtUseFlag 
--Exclude the equal button is Active class 
+- Add AC function that makes changes on fisrtUseFlag
+- add +/- functionality 
+- add % funtionality
+- remove the double zero
 */
 
 for (let i = 0; i < buttons.length; i++) {//fill all the arrays with their respective buttons
@@ -29,13 +31,22 @@ for (let i = 0; i < buttons.length; i++) {//fill all the arrays with their respe
 for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the buttons
     operatorsBtns[i].addEventListener('click', (e) => {
         activeButtonHandler(e.target);
+        if (e.target.value == 'change') {
+            let value = parseInt(screenValue);
+            console.log(value);
+            value >= 0 ? value = - value: value = value - value * 2;
+            numbers.pop();
+            cleanUp();
+            valueOnScreenHandler(value);
+            screenFunction();
+            firstUseFlag = true; // we reseted the flag since we didn't pick an operation, we're still figure out the number.
+        }
         if (firstUseFlag) {
             screenValue = Number(screenValue);
             numbers.push(screenValue)
             firstUseFlag = false;
         }
         if (operations[0] && ['plus', 'menos', 'equal'].includes(e.target.value)) {
-            console.log('normal 1 symbol operation');
             prevOp = operations[operations.length - 1];
             prevNum = numbers[numbers.length - 1];
             operationDispatcher();
@@ -46,12 +57,11 @@ for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the butto
         else if (operations[1] && ['division', 'multi'].includes(e.target.value)) {
             prevOp = operations[operations.length - 1];
             prevNum = numbers[numbers.length - 1];
-            console.log('division or multi');
             operationDispatcher();
             cleanUp();
             valueOnScreenHandler(result);
             screenFunction();
-        } else if (operations.length == 0 && e.target.value === 'equal') {
+        } else if (operations.length == 0 && result && e.target.value === 'equal') {
             equalFunction();
             cleanUp();
             valueOnScreenHandler(result);
@@ -89,7 +99,7 @@ const screenFunction = () => {
 };
 
 const activeButtonHandler = (element) => {
-    if (element.value != 'equal') {
+    if (!['equal', 'change', 'AC'].includes(element.value)) {
         if (pressedButtonOp != element && operationButtonFlag) {
             operationButtonFlag = !operationButtonFlag;
             pressedButtonOp.disabled = operationButtonFlag;
@@ -148,7 +158,6 @@ const enableFloatNumber = (flag) => { //reset the dot button usage
     flag ? flag = false : false;
 }
 const equalFunction = () => {
-    console.log(prevOp, prevNum);
     operations.push(prevOp);
     numbers.push(prevNum);
     operationDispatcher();
