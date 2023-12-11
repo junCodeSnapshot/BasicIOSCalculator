@@ -32,20 +32,24 @@ for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the butto
     operatorsBtns[i].addEventListener('click', (e) => {
         activeButtonHandler(e.target);
         if (e.target.value == 'change') {
-            let value = parseInt(screenValue);
-            console.log(value);
-            value >= 0 ? value = - value: value = value - value * 2;
-            numbers.pop();
+            let value = Number(screenValue);
+            value >= 0 ? value = -value : value = Math.abs(value);
+            if(result && numbers[0] && Math.abs(numbers[0])===Math.abs(value)){
+                numbers[0] = value;
+            }
             cleanUp();
             valueOnScreenHandler(value);
             screenFunction();
             firstUseFlag = true; // we reseted the flag since we didn't pick an operation, we're still figure out the number.
-        }
-        if (firstUseFlag) {
+
+        }else if (firstUseFlag && Math.abs(result) != Math.abs(Number(screenValue))) {
             screenValue = Number(screenValue);
             numbers.push(screenValue)
             firstUseFlag = false;
+        }else{
+            firstUseFlag = false;
         }
+
         if (operations[0] && ['plus', 'menos', 'equal'].includes(e.target.value)) {
             prevOp = operations[operations.length - 1];
             prevNum = numbers[numbers.length - 1];
@@ -75,7 +79,8 @@ for (let i = 0; i < numbersBtns.length; i++) {//add the listeners to the buttons
     numbersBtns[i].addEventListener('click', (e) => {
 
         if (!firstUseFlag) {
-            operations.push(pressedButtonOp.value);
+            pressedButtonOp?
+            operations.push(pressedButtonOp.value): null;
             firstUseFlag = true;
         }
 
@@ -95,6 +100,10 @@ const valueOnScreenHandler = (value) => { //working!
 
 //Mostrar valores en la calculadora
 const screenFunction = () => {
+    if(screenValue.length > 10){    
+        screenValue = Number(screenValue).toFixed(8);
+        screenValue = Number(screenValue).toPrecision(2);
+    }
     screen.innerHTML = screenValue;
 };
 
@@ -129,6 +138,7 @@ const operationDispatcher = () => {
         operations[1] === 'multi' ? multiply(numbers[2], numbers[1]) : null;
         operations[1] === 'division' ? division(numbers[2], numbers[1]) : null;
         operations[0] == 'plus' ? plus(numbers[0], result) : minus(numbers[0], result);
+        // Math.fround
         numbers.push(result);
     } else
         if (['plus', 'menos', 'multi', 'division'].includes(operations[0])) {
