@@ -43,7 +43,7 @@ for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the butto
             valueOnScreenHandler(value);
             screenFunction();
             firstUseFlag = true; // we reseted the flag since we didn't pick an operation, we're still figure out the number.
-        }else if(e.target.value === 'AC'){
+        } else if (e.target.value === 'AC') {
             acFunction();
             console.log('pepe');
         }
@@ -70,11 +70,12 @@ for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the butto
             cleanUp();
             valueOnScreenHandler(result);
             screenFunction();
-        } else if (operations.length == 0 && result && e.target.value === 'equal') {
+        } else if (operations.length == 0 && result != undefined && e.target.value === 'equal') {
             equalFunction();
             cleanUp();
             valueOnScreenHandler(result);
             screenFunction();
+            console.log('here');
         }
     })
 }
@@ -180,30 +181,33 @@ const acFunction = () => {
         screenFunction();
         console.log('heheh');
     }
-    else  if (screenValue != '0' && numbers.length > 0 && operations.length > 0 ) {
+    else if (screenValue != '0' && numbers.length > 0 && operations.length > 0) {
         activeButtonHandler(pressedButtonOp);
         cleanUp();
         valueOnScreenHandler(0);
         screenFunction();
         console.log('picoloh');
 
-    }else{
+    } else {
+        numbers[0] = 0;
         cleanUp();
         valueOnScreenHandler(0);
         screenFunction();
-    }
-        ACBtn.innerHTML = 'AC';
+        operationButtonFlag ? activeButtonHandler(pressedButtonOp) : operationButtonFlag;
+    };
+    result = 0; 
+    ACBtn.innerHTML = 'AC';
 
 };
 const cleanArrays = (array, limit, type) => {
-    if(type === "shift"){
+    if (type === "shift") {
         while (array.length > limit) {
             array.shift();
-        }; 
-    }else{
+        };
+    } else {
         while (array.length > limit) {
             array.pop();
-        }; 
+        };
     }
 };
 
