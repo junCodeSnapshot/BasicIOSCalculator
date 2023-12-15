@@ -1,9 +1,11 @@
 const buttons = document.getElementsByTagName('button'); //get all buttons
 let screen = document.getElementById('screen');
+let ACBtn = document.getElementById('AC');
 let screenValue = '0';
 let floatBtnflag = false;
 let operationButtonFlag = false;
 let firstUseFlag = true;
+let acBtnFlag = false;
 let pressedButtonOp;
 let operations = [];
 let numbers = [];
@@ -14,8 +16,7 @@ let prevNum;
 
 
 /*TODO:
-- Add AC function that makes changes on fisrtUseFlag
-- add +/- functionality 
+- Add AC function that makes changes on fisrtUseFlag and remove the old opbtnSaved
 - add % funtionality
 - remove the double zero
 */
@@ -31,22 +32,26 @@ for (let i = 0; i < buttons.length; i++) {//fill all the arrays with their respe
 for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the buttons
     operatorsBtns[i].addEventListener('click', (e) => {
         activeButtonHandler(e.target);
+        ACBtn.innerHTML = 'C';
         if (e.target.value == 'change') {
             let value = Number(screenValue);
             value >= 0 ? value = -value : value = Math.abs(value);
-            if(result && numbers[0] && Math.abs(numbers[0])===Math.abs(value)){
+            if (result && numbers[0] && Math.abs(numbers[0]) === Math.abs(value)) {
                 numbers[0] = value;
             }
             cleanUp();
             valueOnScreenHandler(value);
             screenFunction();
             firstUseFlag = true; // we reseted the flag since we didn't pick an operation, we're still figure out the number.
-
-        }else if (firstUseFlag && Math.abs(result) != Math.abs(Number(screenValue))) {
+        }else if(e.target.value === 'AC'){
+            acFunction();
+            console.log('pepe');
+        }
+        else if (firstUseFlag && Math.abs(result) != Math.abs(Number(screenValue))) {
             screenValue = Number(screenValue);
             numbers.push(screenValue)
             firstUseFlag = false;
-        }else{
+        } else {
             firstUseFlag = false;
         }
 
@@ -77,14 +82,12 @@ for (let i = 0; i < operatorsBtns.length; i++) {//add the listeners to the butto
 
 for (let i = 0; i < numbersBtns.length; i++) {//add the listeners to the buttons
     numbersBtns[i].addEventListener('click', (e) => {
-
+        ACBtn.innerHTML = 'C';
         if (!firstUseFlag) {
-            pressedButtonOp?
-            operations.push(pressedButtonOp.value): null;
+            pressedButtonOp ?
+                operations.push(pressedButtonOp.value) : null;
             firstUseFlag = true;
         }
-
-
         pressedButtonOp ? operationButtonFlag ?
             (activeButtonHandler(pressedButtonOp), cleanUp(), valueOnScreenHandler(e.target.value), screenFunction()) : (valueOnScreenHandler(e.target.value), screenFunction()) : (valueOnScreenHandler(e.target.value), screenFunction());
     })
@@ -100,7 +103,7 @@ const valueOnScreenHandler = (value) => { //working!
 
 //Mostrar valores en la calculadora
 const screenFunction = () => {
-    if(screenValue.length > 10){    
+    if (screenValue.length > 10) {
         screenValue = Number(screenValue).toFixed(8);
         screenValue = Number(screenValue).toPrecision(2);
     }
@@ -147,14 +150,9 @@ const operationDispatcher = () => {
             operations[0] === 'multi' ? multiply(numbers[0], numbers[1]) : null;
             operations[0] === 'division' ? division(numbers[0], numbers[1]) : null;
             numbers.push(result);
-        }
-
-    while (operations.length > 0) {
-        operations.shift();
-    }
-    while (numbers.length > 1) {
-        numbers.shift();
-    }
+        };
+    cleanArrays(operations, 0);
+    cleanArrays(numbers, 1, 'shift');
 };
 
 
@@ -166,13 +164,48 @@ const cleanUp = () => {//Cleans the screen contents
 
 const enableFloatNumber = (flag) => { //reset the dot button usage
     flag ? flag = false : false;
-}
+};
 const equalFunction = () => {
     operations.push(prevOp);
     numbers.push(prevNum);
     operationDispatcher();
-}
+};
+const acFunction = () => {
+    if (screenValue == '0') {
+        cleanArrays(operations, 0);
+        cleanArrays(numbers, 0);
+        pressedButtonOp = undefined;
+        cleanUp();
+        valueOnScreenHandler(0);
+        screenFunction();
+        console.log('heheh');
+    }
+    else  if (screenValue != '0' && numbers.length > 0 && operations.length > 0 ) {
+        activeButtonHandler(pressedButtonOp);
+        cleanUp();
+        valueOnScreenHandler(0);
+        screenFunction();
+        console.log('picoloh');
 
+    }else{
+        cleanUp();
+        valueOnScreenHandler(0);
+        screenFunction();
+    }
+        ACBtn.innerHTML = 'AC';
+
+};
+const cleanArrays = (array, limit, type) => {
+    if(type === "shift"){
+        while (array.length > limit) {
+            array.shift();
+        }; 
+    }else{
+        while (array.length > limit) {
+            array.pop();
+        }; 
+    }
+};
 
 
 
